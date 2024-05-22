@@ -1,16 +1,17 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner,Table } from "typeorm";
 import { faker } from '@faker-js/faker';
 import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { userTable } from "./migrationEntity/user";
 
 export class User1716248730172 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> 
     {
         if(await this.getTable(queryRunner,"Users")){;
-           await this.createUserRecord(queryRunner, this.generateFakeUserData(10),"superadmin");
+           !await this.createUserRecord(queryRunner, this.generateFakeUserData(10),"superadmin") ? console.log("User migration :: Users table created successfully") : console.error("User migration :: Error creating Users table");
         }else{
-            console.log("User migration :: Users table isn't exist and she'll be created");
-            await this.createTable(queryRunner,"Users");
+           console.log("User migration :: Users table isn't exist and she'll be created");
+           !await this.createTable(queryRunner,"Users") ? console.log("User migration :: Users table created successfully") : console.error("User migration :: Error creating Users table");
         }
     }
 
@@ -18,7 +19,7 @@ export class User1716248730172 implements MigrationInterface {
     {  
         try{
             if(await this.getTable(queryRunner,"Users")){
-                await this.deleteUserTable(queryRunner);
+                !await this.deleteUserTable(queryRunner) ? console.log("User migration :: Users table deleted successfully") : console.error("User migration :: QueryRunner isn't exist. Nothing to delete");
             }else{
                 console.error("User migration :: Users table isn't exist. Nothing to delete");
             }
@@ -31,24 +32,11 @@ export class User1716248730172 implements MigrationInterface {
      * @param queryRunner 
      * @param tableName 
      */
-    public async createTable(queryRunner:QueryRunner, tableName:string) : Promise<void>{
+    public async createTable(queryRunner:QueryRunner, tableName:string) : Promise<any>{
         if (queryRunner || await this.getTable(queryRunner,tableName)) {
-            await queryRunner.query(`
-                CREATE TABLE IF NOT EXISTS forum."${tableName}" (
-                    id VARCHAR(36) PRIMARY KEY,
-                    username VARCHAR(255) NOT NULL UNIQUE,
-                    email VARCHAR(255) NOT NULL UNIQUE,
-                    password VARCHAR(255) NOT NULL,
-                    avatar VARCHAR(255) NULL DEFAULT NULL,
-                    isBlocked TINYINT NOT NULL DEFAULT 0,
-                    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    roleId VARCHAR(36) NULL DEFAULT NULL,
-                    FOREIGN KEY (roleId) REFERENCES Roles (id)
-                )`).then(() => {
-                console.log("User migration :: User table created successfully");
-            }).catch(error => {
-                console.error("User migration :: Error creating Users table\nBecause: \n", error);
-            });
+            queryRunner.createTable(userTable);
+        }else{
+            return undefined;
         }
     }
 
@@ -92,20 +80,17 @@ export class User1716248730172 implements MigrationInterface {
     }
 
     /**
-     * Drop user table
+     * Drop user table []
      * @param queryRunner 
      */
-    public async deleteUserTable(queryRunner:QueryRunner):Promise<void>{
+    public async deleteUserTable(queryRunner:QueryRunner):Promise<any>{
         if(queryRunner)
         {
-            await queryRunner.query(`DROP TABLE IF EXISTS forum.Users`).then(()=>{
-                console.log("User migration :: Users table deleted successfully");
-            }).catch(error=>{
-                console.error("User migration :: Error deleting Users table\nBecause: \n",error);
-            })
-            }else{
-            console.error("User migration :: QueryRunner isn't exist. Nothing to delete");};
+           const context= await queryRunner.query(`DROP TABLE IF EXISTS forum.Users`);
+        }else{
+            return undefined;
         }
+    }
     
 
     /**
