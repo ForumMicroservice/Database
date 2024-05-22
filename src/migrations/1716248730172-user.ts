@@ -1,17 +1,6 @@
-import { MigrationInterface, QueryFailedError, QueryRunner, Unique } from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 import { faker } from '@faker-js/faker';
-import { v4 as uuidv4 } from 'uuid';
-import { error, table } from "console";
-import e from "express";
 import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
-import { kMaxLength } from "buffer";
-import { takeLast } from "rxjs";
-
-enum RelationTablesAndForeignKey {
-    Users  =  "roleId", 
-    Topics =  "userId", 
-    Comments= "userId" 
-}
 
 export class User1716248730172 implements MigrationInterface {
 
@@ -43,7 +32,7 @@ export class User1716248730172 implements MigrationInterface {
      * @param tableName 
      */
     public async createTable(queryRunner:QueryRunner, tableName:string) : Promise<void>{
-        if (queryRunner && tableName) {
+        if (queryRunner || await this.getTable(queryRunner,tableName)) {
             await queryRunner.query(`
                 CREATE TABLE IF NOT EXISTS forum."${tableName}" (
                     id VARCHAR(36) PRIMARY KEY,
@@ -56,17 +45,23 @@ export class User1716248730172 implements MigrationInterface {
                     roleId VARCHAR(36) NULL DEFAULT NULL,
                     FOREIGN KEY (roleId) REFERENCES Roles (id)
                 )`).then(() => {
-                console.log("User migration :: Current table doesn't exist and User table created successfully");
+                console.log("User migration :: User table created successfully");
             }).catch(error => {
                 console.error("User migration :: Error creating Users table\nBecause: \n", error);
             });
         }
     }
 
+    /**
+     * 
+     * @param queryRunner 
+     * @param tableName 
+     * @returns raw database result or undefined
+     */
     public async getTable(queryRunner:QueryRunner, tableName:string) : Promise<any>{
         try{
             if(tableName || queryRunner){
-                return queryRunner.getTable(tableName);
+                return await queryRunner.getTable(tableName);
             }else{
                 return undefined;
             }
@@ -76,7 +71,7 @@ export class User1716248730172 implements MigrationInterface {
     }
 
     /**
-     * Set user role for fake user 
+     * Set user role for fake user seeder
      * @param queryRunner 
      * @param tableName 
      * @param roleName 
@@ -84,7 +79,6 @@ export class User1716248730172 implements MigrationInterface {
      */
     public async getUserRole(queryRunner:QueryRunner,tableName:string, roleName:string) : Promise<any>{
         try{
-           // const role = await this.getUserRole(queryRunner,tableName,roleName);
             if(await this.getTable(queryRunner,tableName)){
                 return queryRunner.query(`SELECT * FROM ${tableName} WHERE name = '${roleName}'`);
             }else{
@@ -98,14 +92,21 @@ export class User1716248730172 implements MigrationInterface {
     }
 
     /**
-     * Looking relations remove it and drop user table
+     * Drop user table
      * @param queryRunner 
      */
     public async deleteUserTable(queryRunner:QueryRunner):Promise<void>{
-         Object.entries(RelationTablesAndForeignKey).forEach(([tableNames, foreignKey]) => {
-            this.DetachedAnyRelationsToUser(queryRunner,tableNames,foreignKey)
-         })
-    }
+        if(queryRunner)
+        {
+            await queryRunner.query(`DROP TABLE IF EXISTS forum.Users`).then(()=>{
+                console.log("User migration :: Users table deleted successfully");
+            }).catch(error=>{
+                console.error("User migration :: Error deleting Users table\nBecause: \n",error);
+            })
+            }else{
+            console.error("User migration :: QueryRunner isn't exist. Nothing to delete");};
+        }
+    
 
     /**
      *  Send and execute query to create data into User table
@@ -132,34 +133,9 @@ export class User1716248730172 implements MigrationInterface {
         }
     }
 
-    /**
-     * Detached any relations for user table
-     * @param queryRunner 
-     * @param tableName 
-     * @param foreignKeyName 
-     */
-    public async DetachedAnyRelationsToUser(queryRunner:QueryRunner, tableName:string , foreignKeyName:string):Promise<void>{
-        const table = await this.getTable(queryRunner,"Users");
-        const foreignKey = table.foreignKeys.find((fk) => fk.columnNames.indexOf(foreignKeyName)); 
-        console.log("[Foreign Keys] :"  + foreignKey);
-        
-        /*
-        if(queryRunner && tableName && foreignKeyName)
-        {
-            
-            /*
-            queryRunner.query(`ALTER TABLE \`${tableName}\` DROP FOREIGN KEY \`${foreignKeyName}\``)
-            .then(() => {
-                console.log(`User migration :: Drop relation from \`${tableName}\` with foregein key \`${foreignKeyName}\` is successful`);
-            })
-            .catch(error => {
-                console.error(`User migration :: Error dropping relation from \`${tableName}\` to \`${foreignKeyName}\`\nBecause: \n`, error);
-            });*/
-    }
-
     /***
      * Configuration faker for fake user generations
-     * @return array with fake user object 
+     * @return object with fake user's object
      * */
     public createRandomUser() : any
     {
@@ -173,8 +149,8 @@ export class User1716248730172 implements MigrationInterface {
     }
     
     /***
-     * Generate fake user data with filtering duplications records  
-     * @returns HashTable collection objects with fake user
+     * Generate fake user data with filtering duplications records  [ A Filtering is not implemented now] 
+     * @returns Array objects with fake user data generation
      */
      public generateFakeUserData(maxFakeUserRecords:number): any{
         if(maxFakeUserRecords > 0)
@@ -184,6 +160,5 @@ export class User1716248730172 implements MigrationInterface {
         }else{
             console.error("User migration :: Count for fake data must be greater than 0");
         }
-      }
-    
+      } 
 }
