@@ -35,19 +35,27 @@ $ npm install
 ## Running the app
 
 ```bash
-# development
+# development mode #1
 $ npm run start
 
-# watch mode
+# development mode #2
 $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+# Run migrations 
+$ npm run migration:run
+
+# Revert migration
+$ npm run migration:revert
+
 ```
 
 ## Test
 
 ```bash
+# P.S Not implement
 # unit tests
 $ npm run test
 
