@@ -3,5 +3,3 @@ EXPOSE 3000
 WORKDIR /usr/src/app/dbapp
 COPY . ./
 RUN ["npm", "install"]
-
-
