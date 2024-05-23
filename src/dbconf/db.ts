@@ -1,6 +1,7 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { registerAs } from "@nestjs/config";
 import { config as dotenvConfig } from 'dotenv';
+import { ParseBoolPipe } from "@nestjs/common";
 
 dotenvConfig({ path: '.env' });
 
@@ -14,7 +15,7 @@ export const config  ={
     entities: ["dist/**/*.entity{.ts,.js}"],
     migrations: ["dist/migrations/*{.ts,.js}"],
     autoLoadEntities: true,
-    synchronize:true
+    synchronize: true
 };
 
 export default registerAs('typeorm', () => config) 
