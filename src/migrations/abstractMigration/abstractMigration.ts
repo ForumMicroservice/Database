@@ -80,6 +80,16 @@ export abstract class MigrationOperations {
     }
 
     /**
+     * Create Records 
+     * @param queryRunner 
+     * @param tableName 
+     * @param table 
+     */
+    public async createRecords(queryRunner:QueryRunner,tableName:string,table:Table) : Promise<any>{
+       //Your override implements into extends class;
+    }
+
+    /**
      * Drop table from database
      * @param queryRunner 
      * @param tableName 
@@ -114,26 +124,6 @@ export abstract class MigrationOperations {
         }catch(error){
             console.error("Migration::Method deleteTable:::Error database because: \n",error);
         }        
-    }
-
-    /**
-     * Create Records into database
-     * @param queryRunner 
-     * @param tableName 
-     * @returns 
-     */
-    public async createRecords(queryRunner:QueryRunner, tableName:string,columns:string[], values:string[]) : Promise<any>
-    {
-        try {
-            if (queryRunner || tableName) {
-                const column = columns.join(', ');
-                const value  = values.map(items => `'${items}'`).join(', ')     
-                const isTable = await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`INSERT INTO '${tableName}'  '${column}' VALUES ('${uuidv4()}', '${value}'`) : false
-              return isTable;                                                                          
-            }
-        } catch (error) {
-             console.error("Migration::Method createRecords:::Error database because: \n", error);
-        }
     }
 }
 
