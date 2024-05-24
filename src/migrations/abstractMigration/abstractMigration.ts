@@ -1,7 +1,4 @@
 import { QueryRunner,Table } from "typeorm";
-import { roleTable } from "../migrationEntity/role";
-import { userTable } from "../migrationEntity/user";
-import { v4 as uuidv4 } from 'uuid';
 
 export abstract class MigrationOperations {
     private queryRunner:QueryRunner;
@@ -17,11 +14,8 @@ export abstract class MigrationOperations {
      */
     public async getTable(queryRunner:QueryRunner,tableName:string):Promise<boolean>{
         try{
-            if(queryRunner || tableName)
-             {
-                 const table : any = await queryRunner.getTable(tableName);
-                return table instanceof Table ? true : false; 
-             }
+            const table : any = await queryRunner.getTable(tableName);
+            return table instanceof Table ? true : false;  
         }catch(error){
             console.error("Migration:: Method getTable :: Error database because: \n",error);
         }   
@@ -35,13 +29,26 @@ export abstract class MigrationOperations {
     public async getDatabase(queryRunner:QueryRunner, databaseName:string) : Promise<boolean>
     { 
         try{
-            if(queryRunner || databaseName)
-            {
-                return await queryRunner.hasDatabase(databaseName) ? true : false;
-            }
+           return await queryRunner.hasDatabase(databaseName) ? true : false;
         }catch(error){
             console.error("Migration::Method getDatabase:::Error database because: \n",error);
         }  
+    }
+
+    /**
+     * Get user role 
+     * @param queryRunner 
+     * @param tableName 
+     * @param roleName 
+     * @returns raw database result or undefined
+     */
+    public async getRole(queryRunner:QueryRunner,tableName:string, roleName:string) : Promise<any>{
+        try{
+            const role =  await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`SELECT id FROM ${tableName} WHERE name = '${roleName}'`) : false;
+            return role;
+        }catch(error){
+            console.error("User migration :: Error getting Roles table\nBecause: \n",error);
+        }
     }
 
     /**
@@ -51,11 +58,8 @@ export abstract class MigrationOperations {
      */
     public async createDatabase(queryRunner:QueryRunner,databaseName:string) : Promise<any>{
         try{
-            if(queryRunner || databaseName)
-            {
-              const isDatabase = await this.getDatabase(queryRunner,databaseName) ? true : false;
-                    isDatabase == false ? await queryRunner.createDatabase(databaseName,true) : console.log("Migration:::createDatabase Method ::: Don't worry, database existing ...");  
-            }
+            const isDatabase = await this.getDatabase(queryRunner,databaseName) ? true : false;
+                  isDatabase == false ? await queryRunner.createDatabase(databaseName,true) : console.log("Migration:::createDatabase Method ::: Don't worry, database existing ...");  
         }catch(error){
             console.error("Migration::: createDatabase Method:::Error database because, because of ",`${error}`)
         }
@@ -67,13 +71,10 @@ export abstract class MigrationOperations {
      * @param tableName 
      * @returns true or false
      */
-    public async createTable(queryRunner:QueryRunner, tableName,table:Table) : Promise<any>{
+    public async createTable(queryRunner:QueryRunner, tableName:string,table:Table) : Promise<any>{
        try{
-        if(queryRunner || tableName || table)
-        {
-            const isTable = await this.getTable(queryRunner,tableName) == false ? await queryRunner.createTable(new Table(table)) : false;
-            return isTable;
-         }
+          const isTable = await this.getTable(queryRunner,tableName) == false ? await queryRunner.createTable(new Table(table)) : false;
+          return isTable;
        }catch(error){
            console.error("Migration::createTable method:::Database error , because" ,`${error}`);
        } 
@@ -85,8 +86,8 @@ export abstract class MigrationOperations {
      * @param tableName 
      * @param table 
      */
-    public async createRecords(queryRunner:QueryRunner,tableName:string,table:Table) : Promise<any>{
-       //Your override implements into extends class;
+    public async createRecords(queryRunner:QueryRunner,tableName:string,roleName:string="",users:any="") : Promise<any>{
+       // Your override implements into extends class; 
     }
 
     /**
@@ -98,10 +99,8 @@ export abstract class MigrationOperations {
     public async deleteTable(queryRunner:QueryRunner, tableName:string) : Promise<any>
     {
         try{
-            if(queryRunner || tableName){
-                const isTable = await this.getTable(queryRunner,tableName) == true ? await queryRunner.dropTable(tableName) : false;
-                return isTable;
-            }
+            const  isTable = await this.getTable(queryRunner,tableName) == true ? await queryRunner.dropTable(tableName) : false;
+            return isTable;
         }catch(err){
             console.error("Migration::Method deleteTable:::Error database because: \n",err);
         }
@@ -116,11 +115,8 @@ export abstract class MigrationOperations {
     public async deleteRecords(queryRunner:QueryRunner,tableName:string) : Promise<any>
     {
         try{
-            if(queryRunner || tableName)
-            {
-               const isTable = await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`DELETE FROM "${tableName}"`) : false;
-               return isTable;
-            }
+           const isTable = await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`DELETE FROM "${tableName}"`) : false;
+           return isTable;
         }catch(error){
             console.error("Migration::Method deleteTable:::Error database because: \n",error);
         }        
