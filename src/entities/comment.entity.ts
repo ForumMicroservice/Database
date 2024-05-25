@@ -1,30 +1,28 @@
-import { Column, Entity, Generated, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Generated, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Table } from "typeorm";
 import { User } from "./user.entity";
 import { Subject } from "./subject.entity";
-import { Topic } from "./topics.entity";
 
 @Entity('Comments')
-export class Comment{
+export class Comment {
 
 @PrimaryGeneratedColumn('uuid')
 @Generated("uuid") id: string;
  
-@ManyToOne(() => User, (user)=> user.comment)
-user: User
-example:string
+@ManyToOne(() => User, (user)=> user.comments,{onDelete:'SET NULL',onUpdate:'CASCADE'})
+users: User
 
-@OneToMany(() =>Subject , (subject) => subject.comment)
-subject: Subject[]
+@ManyToOne(() =>Subject , (subject) => subject.comments,{onDelete:'SET NULL',onUpdate:'CASCADE'})
+subjects: Subject;
 
-@ManyToOne(() =>Comment, (comment) => comment.replies)
-rootComment:Comment
+@ManyToOne(() =>Comment, (comment) => comment.replies,{onDelete:'SET NULL',onUpdate:'CASCADE'})
+rootComments:Comment
 
-@OneToMany(() => Comment, (comment) => comment.rootComment)
+@OneToMany(() => Comment, (comment) => comment.rootComments,{cascade:true})
 replies:Comment[]
 
-@Column({nullable:true})
-comment: string;
+@Column({type: 'text' , nullable:true})
+comments: string;
 
 @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-createdAt: Date;
+createSdAt: Date;
 }

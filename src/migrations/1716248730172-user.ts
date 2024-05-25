@@ -72,10 +72,10 @@ export class User1716248730172 extends MigrationOperations implements MigrationI
         try{
           const roleGuid = await this.getRole(queryRunner,"Roles",roleName);
           users.forEach((fakeUsers)=>{
-          queryRunner.query(`INSERT INTO Users(id,username, email, password,avatar, isBlocked, roleId) VALUES 
+          queryRunner.query(`INSERT INTO Users(id,usernames, emails, passwords,avatars, rolesId) VALUES 
                                               ('${fakeUsers.userId}', "${fakeUsers.username}", 
                                                '${fakeUsers.email}' , '${fakeUsers.password}', 
-                                               '${fakeUsers.avatar}', 0 ,'${roleGuid[0].id}')`);});
+                                               '${fakeUsers.avatar}','${roleGuid[0].id}')`);});
         }catch(error){
            console.error("User migration :: Error creating fake users records\nBecause duplicate value constraint\nBecause: \n",error);
         }

@@ -44,7 +44,7 @@ export abstract class MigrationOperations {
      */
     public async getRole(queryRunner:QueryRunner,tableName:string, roleName:string) : Promise<any>{
         try{
-            const role =  await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`SELECT id FROM ${tableName} WHERE name = '${roleName}'`) : false;
+            const role =  await this.getTable(queryRunner,tableName) == true ? await queryRunner.query(`SELECT id FROM ${tableName} WHERE names = '${roleName}'`) : false;
             return role;
         }catch(error){
             console.error("User migration :: Error getting Roles table\nBecause: \n",error);
@@ -71,7 +71,7 @@ export abstract class MigrationOperations {
      * @param tableName 
      * @returns true or false
      */
-    public async createTable(queryRunner:QueryRunner, tableName:string,table:Table) : Promise<any>{
+    public async createTable(queryRunner:QueryRunner, tableName:string="",table:Table) : Promise<any>{
        try{
           const isTable = await this.getTable(queryRunner,tableName) == false ? await queryRunner.createTable(new Table(table)) : false;
           return isTable;

@@ -38,7 +38,7 @@ export class Roles1716161082809 extends MigrationOperations implements Migration
     public override async createRecords(queryRunner:QueryRunner) : Promise<any>{
 
         if(queryRunner){
-            const isTable = await this.getTable(queryRunner,"Roles") == true ? await queryRunner.query(`INSERT INTO Roles (id, name) VALUES ('${uuidv4()}', 'superadmin'),
+            const isTable = await this.getTable(queryRunner,"Roles") == true ? await queryRunner.query(`INSERT INTO Roles (id, names) VALUES ('${uuidv4()}', 'superadmin'),
                                                                                                                                             ('${uuidv4()}', 'admin'), ('${uuidv4()}', 'users')`) : false
             return isTable;               
         }

@@ -7,20 +7,20 @@ export class Topic {
   @PrimaryGeneratedColumn('uuid')
   @Generated("uuid") id: string;
 
-  @ManyToOne(() => User, user => user.topic,{onDelete:'CASCADE'})
-  user: User;
+  @ManyToOne(() => User, users => users.topics,{onDelete:'CASCADE',onUpdate:'CASCADE'})
+  users: User;
   
   @OneToMany(() => Subject , (subject) => subject, {cascade:true})
-  subject:Subject[]
+  subjects:Subject[]
 
   @Column({ nullable: false, unique: true })
-  name: string;
+  names: string;
 
   @Column({ nullable: false })
-  description: string;
+  descriptions: string;
 
   @Column({ nullable: true })
-  avatar: string;
+  avatars: string;
   
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
