@@ -5,32 +5,33 @@ import { Comment } from './comment.entity';
 
 @Entity('Users')
 export class User {
+
   @PrimaryGeneratedColumn('uuid')
   @Generated("uuid") id: string;
   
   @Column({nullable:false, unique:true})
-  username:string; 
+  usernames:string; 
   
   @Column({ nullable: false, unique: true })
-  email: string;
+  emails: string;
 
   @Column({ nullable: false })
-  password: string;
+  passwords: string;
 
   @Column({ nullable: true })
-  avatar: string;
+  avatars: string;
 
-  @ManyToOne(() => Role, role => role.users,{onDelete:'CASCADE'})
-  role: Role;
+  @ManyToOne(() => Role, role => role.users,{onDelete:'SET NULL',onUpdate:'CASCADE'})
+  roles: Role;
  
-  @OneToMany(() => Topic , topic => topic.user,{cascade:true})
-  topic : Topic[] 
+  @OneToMany(() => Topic , topic => topic.users,{cascade:true})
+  topics : Topic[] 
 
-  @Column({ default: false })
-  isBlocked: boolean;
+  @Column({ default: 0})
+  isBlockeds: boolean;
 
-  @OneToMany(() => Comment , (comment) => comment,{cascade:true})
-  comment: Comment[]
+  @OneToMany(() => Comment , (comment) => comment,{cascade:true}) 
+  comments: Comment[]
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -9,32 +9,34 @@ export const userTable = new Table({
         name: "id",
         type: "varchar",
         isPrimary: true,
+        generationStrategy: "uuid",
+       // default:"uuid_generate_v4()"
       },
       {
-        name: "username",
+        name: "usernames",
         type: "varchar",
         isNullable: false,
         isUnique: true,
       },
       {
-        name: "email",
+        name: "emails",
         type: "varchar",
         isNullable: false,
         isUnique: true,
       },
       {
-        name: "password",
+        name: "passwords",
         type: "varchar",
         isNullable: false,
       },
       {
-        name: "avatar",
+        name: "avatars",
         type: "varchar",
         isNullable: true,
         default: null,
       },
       {
-        name: "isBlocked",
+        name: "isBlockeds",
         type: "tinyint",
         isNullable: false,
         default: 0,
@@ -46,7 +48,7 @@ export const userTable = new Table({
         default: "CURRENT_TIMESTAMP",
       },
       {
-        name: "roleId",
+        name: "rolesId",
         type: "varchar",
         isNullable: true,
         default: null,
@@ -55,7 +57,7 @@ export const userTable = new Table({
     foreignKeys: [
       {
         name: "fk_user_role",
-        columnNames: ["roleId"],
+        columnNames: ["rolesId"],
         referencedTableName: "Roles",
         referencedColumnNames: ["id"],
         onDelete: "SET NULL",

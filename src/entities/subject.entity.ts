@@ -8,16 +8,19 @@ export class Subject{
  @Generated("uuid") id: string;
 
  @Column({nullable:false , unique:true})
- name:string;
+ names:string;
  
- @Column({nullable:true})
- avatar: string 
- 
- @ManyToOne(() => Topic , (topic) => topic.subject)
- topic: Topic
+ @Column({type:'text', nullable:false})
+ contexts: string
 
- @ManyToOne(() => Comment ,(comment) => comment.subject )
- comment: Comment
+ @Column({nullable:true})
+ avatars: string 
+ 
+ @ManyToOne(() => Topic , (topic) => topic.subjects,{onDelete:'SET NULL',onUpdate:'CASCADE'})
+ topics: Topic
+
+ @OneToMany(() => Comment ,(comment) => comment.subjects,{onDelete:'CASCADE',onUpdate:'CASCADE'})
+ comments: Comment[]
 
  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
  createdAt: Date;

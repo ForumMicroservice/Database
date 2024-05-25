@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Generated } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Generated, IsNull } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('Roles')
@@ -6,11 +6,12 @@ export class Role {
   @PrimaryGeneratedColumn('uuid')
   @Generated("uuid") id: string;
 
-  @Column({unique:true})
-  name: string;
+  @Column({ nullable:false,unique:true})
+  names: string;
 
-  @OneToMany(() => User, user => user.role,{
+  @OneToMany(() => User, user => user.roles,{
     cascade:true
   })
   users: User[];
 }
+ 
