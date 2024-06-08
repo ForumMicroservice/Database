@@ -29,7 +29,7 @@ export abstract class MigrationOperations {
     public async getDatabase(queryRunner:QueryRunner, databaseName:string) : Promise<boolean>
     { 
         try{
-           return await queryRunner.hasDatabase(databaseName) ? true : false;
+           return await queryRunner.hasDatabase(databaseName) == true ? true : false;
         }catch(error){
             console.error("Migration::Method getDatabase:::Error database because: \n",error);
         }  
