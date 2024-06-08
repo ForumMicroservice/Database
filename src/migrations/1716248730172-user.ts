@@ -73,7 +73,7 @@ export class User1716248730172 extends MigrationOperations implements MigrationI
           const roleGuid = await this.getRole(queryRunner,"Roles",roleName);
           users.forEach((fakeUsers)=>{
           queryRunner.query(`INSERT INTO Users(id,usernames, emails, passwords,avatars, rolesId) VALUES 
-                                              ('${fakeUsers.userId}', "${fakeUsers.username}", 
+                                              ('${fakeUsers.userId}', '${fakeUsers.username.replace(/'/g, "\\'")}', 
                                                '${fakeUsers.email}' , '${fakeUsers.password}', 
                                                '${fakeUsers.avatar}','${roleGuid[0].id}')`);});
         }catch(error){
